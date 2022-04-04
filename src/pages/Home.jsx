@@ -6,28 +6,32 @@ import Button from '../components/Button';
 import CreatePlaylistForm from '../components/CreatePlaylistForm';
 import { getUserProfile } from '../lib/fetchApi';
 import { toast } from 'react-toastify';
+import { useDocumentTitle } from '../lib/customHooks';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../slice/authSlice';
 
 export default function Home() {
-  const [accessToken, setAccessToken] = useState('');
-  const [isAuthorize, setIsAuthorize] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [selectedTracksUri, setSelectedTracksUri] = useState([]);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const [isInSearch, setIsInSearch] = useState(false);
-  const [user, setUser] = useState({});
+  const isAuthorize = useSelector((state) => state.auth.isAuthorize);
+  const dispatch = useDispatch();
+
+  useDocumentTitle('Home - Spotipy');
 
   useEffect(() => {
     const accessTokenParams = new URLSearchParams(window.location.hash).get('#access_token');
 
     if (accessTokenParams !== null) {
-      setAccessToken(accessTokenParams);
-      setIsAuthorize(true);
-
       const setUserProfile = async () => {
         try {
-          const response = await getUserProfile(accessTokenParams);
+          const responseUser = await getUserProfile(accessTokenParams);
 
-          setUser(response);
+          dispatch(login({
+            accessToken: accessTokenParams,
+            user: responseUser
+          }));
         } catch (e) {
           toast.error(e);
         }
@@ -43,7 +47,7 @@ export default function Home() {
     }
   }, [selectedTracksUri, selectedTracks, isInSearch]);
 
-  const getSpotifyLinkAuthorize = () => {
+   const getSpotifyLinkAuthorize = () => {
     const state = Date.now().toString();
     const clientId = process.env.REACT_APP_CLIENT_ID;
 
@@ -77,48 +81,44 @@ export default function Home() {
 
   return (
     <>
-      {!isAuthorize && (
-        <main className="center">
-          <p>Login for next step...</p>
-          <Button href={getSpotifyLinkAuthorize()}>Authorize</Button>
-        </main>
-      )}
+    {!isAuthorize && (
+      <main className="center">
+        <p>Login for next step...</p>
+        <Button href={getSpotifyLinkAuthorize()}>Authorize</Button>
+      </main>
+    )}
 
-      {isAuthorize && (
-        <main className="container" id="home">
-          <CreatePlaylistForm
-            accessToken={accessToken}
-            userId={user.id}
-            uriTracks={selectedTracksUri}
-          />
+    {isAuthorize && (
+      <main className="container" id="home">
+        <CreatePlaylistForm uriTracks={selectedTracksUri} />
 
-          <hr />
+        <hr />
 
-          <SearchBar
-            accessToken={accessToken}
-            onSuccess={onSuccessSearch}
-            onClearSearch={clearSearch}
-          />
+        <SearchBar
+          onSuccess={onSuccessSearch}
+          onClearSearch={clearSearch}
+        />
 
-          <div className="content">
-            {tracks.length === 0 && (
-              <p>No tracks</p>
-            )}
+        <div className="content">
+          {tracks.length === 0 && (
+            <p>No tracks</p>
+          )}
 
-            <div className="tracks">
-              {tracks.map((track) => (
-                <Track
-                  key={track.id}
-                  imageUrl={track.album.images[0].url}
-                  title={track.name}
-                  artist={track.artists[0].name}
-                  toggleSelect={() => toggleSelect(track)}
-                />
-              ))}
-            </div>
+          <div className="tracks">
+            {tracks.map((track) => (
+              <Track
+                key={track.id}
+                imageUrl={track.album.images[0].url}
+                title={track.name}
+                artist={track.artists[0].name}
+                select={selectedTracksUri.includes(track.uri)}
+                toggleSelect={() => toggleSelect(track)}
+              />
+            ))}
           </div>
-        </main>
-      )}
-    </>
-  );
+        </div>
+      </main>
+    )}
+  </>
+);
 }

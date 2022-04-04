@@ -5,8 +5,10 @@ import PropTypes from 'prop-types';
 import Input from '../Input';
 import { searchTrack } from '../../lib/fetchApi';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
-export default function SearchBar({ accessToken, onSuccess, onClearSearch }) {
+export default function SearchBar({ onSuccess, onClearSearch }) {
+  const accessToken = useSelector((state) => state.auth.accessToken);
   const [text, setText] = useState('');
   const [isClear, setIsClear] = useState(true);
 
