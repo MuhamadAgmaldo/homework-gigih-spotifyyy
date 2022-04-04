@@ -5,8 +5,10 @@
 }
 
 #home {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  width: auto;
+  background-color: rgba(203, 249, 153, 0.772);
+  background-image: url('https://i.pinimg.com/originals/05/38/23/053823518ff6ae997fcf3f3833be56f1.jpg');
+  border-width: 0ch;
 }
 
 .content {
