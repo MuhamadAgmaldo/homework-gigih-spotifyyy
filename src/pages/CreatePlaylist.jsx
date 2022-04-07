@@ -1,45 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import Track from '../components/Track';
 import SearchBar from '../components/SearchBar';
-import config from '../lib/config';
-import Button from '../components/Button';
 import CreatePlaylistForm from '../components/CreatePlaylistForm';
-import { getUserProfile } from '../lib/fetchApi';
-import { toast } from 'react-toastify';
 import { useDocumentTitle } from '../lib/customHooks';
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../slice/authSlice';
+import Layout from '../components/Layout';
 
 export default function Home() {
   const [tracks, setTracks] = useState([]);
   const [selectedTracksUri, setSelectedTracksUri] = useState([]);
   const [selectedTracks, setSelectedTracks] = useState([]);
   const [isInSearch, setIsInSearch] = useState(false);
-  const isAuthorize = useSelector((state) => state.auth.isAuthorize);
-  const dispatch = useDispatch();
+  const [message, setMessage] = useState('No tracks');
 
-  useDocumentTitle('Home - Spotipy');
-
-  useEffect(() => {
-    const accessTokenParams = new URLSearchParams(window.location.hash).get('#access_token');
-
-    if (accessTokenParams !== null) {
-      const setUserProfile = async () => {
-        try {
-          const responseUser = await getUserProfile(accessTokenParams);
-
-          dispatch(login({
-            accessToken: accessTokenParams,
-            user: responseUser
-          }));
-        } catch (e) {
-          toast.error(e);
-        }
-      }
-
-      setUserProfile();
-    }
-  }, []);
+  useDocumentTitle('Create Playlist - Spotipy');
 
   useEffect(() => {
     if (!isInSearch) {
@@ -47,23 +20,27 @@ export default function Home() {
     }
   }, [selectedTracksUri, selectedTracks, isInSearch]);
 
-   const getSpotifyLinkAuthorize = () => {
-    const state = Date.now().toString();
-    const clientId = process.env.REACT_APP_CLIENT_ID;
-
-    return `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=http://localhost:3000&state=${state}&scope=${config.SPOTIFY_SCOPE}`;
-  }
-
-  const onSuccessSearch = (searchTracks) => {
+  const onSuccessSearch = (searchTracks, query) => {
     setIsInSearch(true);
 
     const selectedSearchTracks = searchTracks.filter((track) => selectedTracksUri.includes(track.uri));
 
-    setTracks([...new Set([...selectedSearchTracks, ...searchTracks])])
+    setTracks(() => {
+      const _tracks = [...new Set([...selectedSearchTracks, ...searchTracks])];
+
+      if (_tracks.length === 0) {
+        setMessage(`No tracks found with query "${query}"`);
+      } else {
+        setMessage('');
+      }
+
+      return _tracks;
+    });
   }
 
   const clearSearch = () => {
     setTracks(selectedTracks);
+    setMessage('No tracks');
     setIsInSearch(false);
   }
 
@@ -80,15 +57,7 @@ export default function Home() {
   }
 
   return (
-    <>
-    {!isAuthorize && (
-      <main className="center">
-        <p>Login for next step...</p>
-        <Button href={getSpotifyLinkAuthorize()}>Authorize</Button>
-      </main>
-    )}
-
-    {isAuthorize && (
+    <Layout>
       <main className="container" id="home">
         <CreatePlaylistForm uriTracks={selectedTracksUri} />
 
@@ -101,7 +70,7 @@ export default function Home() {
 
         <div className="content">
           {tracks.length === 0 && (
-            <p>No tracks</p>
+            <p>{message}</p>
           )}
 
           <div className="tracks">
@@ -118,7 +87,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-    )}
-  </>
-);
+    </Layout>
+  );
 }
