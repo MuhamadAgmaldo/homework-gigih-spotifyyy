@@ -24,6 +24,7 @@ export const authSlice = createSlice({
 
       localStorage.removeItem('accessToken');
       localStorage.removeItem('expiredDate');
+      localStorage.removeItem('user');
     },
   }
 });

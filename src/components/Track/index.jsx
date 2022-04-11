@@ -24,7 +24,12 @@ export default function Track({ imageUrl, title, artist, toggleSelect }) {
         </div>
         
         <div className="card__action">
-          <Button variant={isSelected ? 'primary' : 'secondary'} onClick={handleToggleSelect}>{isSelected ? 'Deselect' : 'Select'}</Button>
+          <Button
+            variant={isSelected ? 'primary' : 'secondary'}
+            onClick={handleToggleSelect}
+          >
+            {isSelected ? 'Deselect' : 'Select'}
+          </Button>
         </div>
       </div>
     </div>
