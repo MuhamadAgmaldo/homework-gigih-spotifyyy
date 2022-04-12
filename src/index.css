@@ -49,3 +49,42 @@ hr {
 .mt-1 {
   margin-top: 0.25rem;
 }
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.truncate {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#home {
+  width: auto;
+  background-image: url('https://i.pinimg.com/originals/05/38/23/053823518ff6ae997fcf3f3833be56f1.jpg');
+  border-width: 0ch;
+}
+
+.content {
+  margin-top: 40px;
+}
+
+.tracks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+@media screen and (min-width: 640px) {
+  .container {
+    padding: 0 50px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .container {
+    padding: 0 100px;
+  }
+}
