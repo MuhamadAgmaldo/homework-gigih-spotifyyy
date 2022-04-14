@@ -63,9 +63,19 @@ hr {
 
 #home {
   width: auto;
+  /* background-color: lawngreen; */
   background-image: url('https://i.pinimg.com/originals/05/38/23/053823518ff6ae997fcf3f3833be56f1.jpg');
-  border-width: 0ch;
+  position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    min-width: 50%;
+    min-height: 50%;
 }
+ 
+
 
 .content {
   margin-top: 40px;
